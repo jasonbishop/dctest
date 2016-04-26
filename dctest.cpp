@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2003 Timothy A. Seufert (tas@mindspring.com)
+// Copyright (c) 2016 Jason Bishop (jason.bishop@gmail.com)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -56,8 +57,9 @@
 
 
 const char* copyright_banner =
-    "Disk Corruption Tester (dctest) version 2.2\n"
-    "Copyright (C) 2003 Timothy A. Seufert (tas@mindspring.com)\n";
+  "Disk Corruption Tester (dctest) version 2.2\n"
+  "Copyright (C) 2003 Timothy A. Seufert (tas@mindspring.com)\n"
+  "Copyright (C) 2016 Jason Bishop (jason.bishop@gmail.com)\n";
 
 
 typedef enum { CREATE, VERIFY } testmode;
