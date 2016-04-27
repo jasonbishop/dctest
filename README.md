@@ -44,6 +44,8 @@ Each invocation of dctest operates on a set of files or devices which are destru
 
 ## example
 
+:exclamation: /tmp/googoo in this example will be overwritten.  keep this in mind when choosing a location to run dctest test.
+
 	$ ./dctest --size 200 --verify 3 --count 2 --name /tmp/googoo
 
 	Beginning test iteration #1; creating test file...
