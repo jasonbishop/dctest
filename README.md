@@ -4,7 +4,7 @@ storage data corruption test utility
 ## prbs23
 This utility uses [prbs23](https://en.wikipedia.org/wiki/Pseudorandom_binary_sequence) pseudorandom binary sequence method for testing for data corruption.
 
-Each invocation of dctest operates on a set of files or devices which are destructively written to and read from.  
+Each invocation of dctest operates on a set of files or devices which are destructively written to and read from.  In addition, every other test iteration inverts the bit sequence to make sure any detect any lost writes.
 
 ## usage
 
@@ -77,9 +77,7 @@ Each invocation of dctest operates on a set of files or devices which are destru
 	Finished testing.
 
 
-### background on prbs23
-
-Notes on the above PRBS23 pseudorandom bit sequence generator:
+### Notes on the above PRBS23 pseudorandom bit sequence generator:
 
 PRBSn generators are serial shift registers n bits long with
 feedback taps at two or more bit positions.  The initial value
