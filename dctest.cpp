@@ -83,8 +83,8 @@ uint32_t bufsize = 0;
 //
 // Global settings.
 //
-char* testfilename = "test.dat";
-char* logfilename = "dctest.log";
+const char* testfilename = "test.dat";
+const char* logfilename = "dctest.log";
 uint32_t testcount = 1;
 uint32_t verifypasses = 1;
 uint32_t filesize_MB = 100;
@@ -105,12 +105,12 @@ off_t filesize = 0;
 //
 
 struct ptable_entry {
-	char* name;
-	char* alt_name;
-	char* description;
+	const char* name;
+	const char* alt_name;
+	const char* description;
 	uint32_t* uint_param;
 	bool* bool_param;
-	char** string_param;
+	const char** string_param;
 	bool interactive_entry_allowed;
 };
 
@@ -305,7 +305,7 @@ void fillbuf(uint32_t* buf, uint32_t buflen, uint32_t& shiftreg, bitmode bmode)
 //
 // Check that a buffer contains PRBS23 data.
 //
-void checkbuf(uint32_t* buf, uint32_t buflen, uint32_t& shiftreg, int& found_corruption, off_t offset, bitmode bmode)
+void checkbuf(uint32_t* buf, uint32_t buflen, uint32_t& shiftreg, long int& found_corruption, off_t offset, bitmode bmode)
 {
 	register uint32_t s = shiftreg;
 	if (bmode == COMPLEMENT) {
@@ -314,7 +314,7 @@ void checkbuf(uint32_t* buf, uint32_t buflen, uint32_t& shiftreg, int& found_cor
 
 	for (uint32_t i = 0; i < buflen; i++) {
 		if (buf[i] != s) {
-			fprintf(logfile, "\tERROR: At file offset %016llX, expected %08X, got %08X\n",
+			fprintf(logfile, "\tERROR: At file offset %016lX, expected %08X, got %08X\n",
 					offset + ((off_t)i * sizeof(uint32_t)), s, buf[i]);
 			found_corruption = 1;
 			progress_mark = 'E';
@@ -333,7 +333,7 @@ void checkbuf(uint32_t* buf, uint32_t buflen, uint32_t& shiftreg, int& found_cor
 //
 // Structure for communicating information to worker threads
 //
-typedef struct workorder {
+struct workorder {
   workqueue* q;
   testmode mode;
   int fd;
@@ -354,7 +354,10 @@ public:
 		// buffers when the requested block of memory is larger than a page.  Should
 		// use posix_memalign instead of malloc on systems which support it.
 		//
-		posix_memalign((void**)&buf, getpagesize(), bufsize * sizeof(uint32_t));
+		int ret = posix_memalign((void**)&buf, getpagesize(), bufsize * sizeof(uint32_t));
+		if (0 != ret) {
+		  printf("posix_memalign returned error\n");
+		}
 	}
 	virtual ~wbuf() {
 		free(buf);
@@ -421,7 +424,7 @@ void* consumer_fn(void* param)
 
 	uint32_t shiftreg = PRBS23_INITIAL_VALUE;
 	off_t progress = 0;
-	int found_corruption = 0;
+	long int found_corruption = 0;
 
 	init_progress_display(wo->filesize * sizeof(uint32_t));
 
@@ -463,10 +466,10 @@ void* consumer_fn(void* param)
 //
 // File size parameter is in units of uint32_t, not char.
 //
-int process_testfile(testmode mode, char* filename, off_t filesize, int count)
+int process_testfile(testmode mode, const char* filename, off_t filesize, int count)
 {
 	int found_corruption = 0;
-	pthread_t producer, consumer, consumer1;
+	pthread_t producer, consumer;
 	pthread_attr_t attr;
 	int fd;
 
@@ -616,7 +619,10 @@ void read_arguments(void)
 		if (ptable[p].interactive_entry_allowed == true) {
 			printf("%s%s: ", ptable[p].description,
 				   (ptable[p].bool_param != NULL) ? (" [y/n] (n)") : (""));
-			fgets(param, 512, stdin);
+			char* ret = fgets(param, 512, stdin);
+			if (NULL == ret) {
+			  printf("fgets returned error\n");
+			}
 			token = strtok(param, " \f\n\r\t\v");
 			if (token != NULL) {
 				if (ptable[p].uint_param != NULL) {
